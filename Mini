@@ -1,0 +1,140 @@
+from tkinter import *
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
+from sklearn.metrics import accuracy_score
+
+global filename
+global df, X_train, X_test, y_train, y_test
+
+main = tk.Tk()
+main.title("Machine Learning Based Framework for Maintaining Privacy of Healthcare Data ") 
+main.geometry("1600x1500")
+
+font = ('times', 16, 'bold')
+title = Label(main, text='Machine Learning Based Framework for Maintaining Privacy of Healthcare Data ',font=("times"))
+title.config(bg='Dark Blue', fg='white')
+title.config(font=font)           
+title.config(height=3, width=105)
+title.place(x=0, y=5)
+
+font1 = ('times', 12, 'bold')
+text = Text(main, height=14, width=120)
+scroll = Scrollbar(text)
+text.configure(yscrollcommand=scroll.set)
+text.place(x=50, y=120)
+text.config(font=font1)
+
+# Upload Function
+def upload():
+    global filename, df
+    filename = filedialog.askopenfilename(initialdir="dataset")
+    pathlabel.config(text=filename)
+    df = pd.read_csv(filename)
+    text.delete('1.0', END)
+    text.insert(END, 'Dataset loaded\n')
+    text.insert(END, "Dataset Size: " + str(len(df)) + "\n")
+
+font1 = ('times', 13, 'bold')
+
+uploadButton = Button(main, text="Upload Dataset", command=upload, bg="sky blue")
+uploadButton.place(x=50, y=450)
+uploadButton.config(font=font1)
+
+pathlabel = Label(main)
+pathlabel.config(bg='DarkOrange1', fg='white')  
+pathlabel.config(font=font1)           
+pathlabel.place(x=330, y=450)
+
+# Function to display age distribution
+def show_age_distribution():
+    plt.figure(figsize=(10, 6))
+    sns.displot(df['Age'], kde=True, bins='auto')
+    plt.title('Distribution of Age')
+    plt.xlabel('Age')
+    plt.ylabel('Density')
+    plt.show()
+
+# Button for age distribution
+ageButton = Button(main, text="Age Distribution", command=show_age_distribution, bg="sky blue")
+ageButton.place(x=50, y=520)
+ageButton.config(font=font1)
+
+# Function to display gender distribution
+def show_gender_distribution():
+    plt.figure(figsize=(8, 8))
+    df['Gender'].value_counts().plot(kind='pie', autopct="%.2f%%")
+    plt.title('Gender Distribution')
+    plt.ylabel('')
+    plt.show()
+
+# Button for gender distribution
+genderButton = Button(main, text="Gender Distribution", command=show_gender_distribution, bg="light green")
+genderButton.place(x=200, y=520)
+genderButton.config(font=font1)
+
+# Function to display insurance provider distribution
+def show_insurance_distribution():
+    plt.figure(figsize=(8, 8))
+    df['Insurance Provider'].value_counts().plot(kind='pie', autopct="%.2f%%")
+    plt.title('Insurance Provider Distribution')
+    plt.ylabel('')
+    plt.show()
+
+# Button for insurance provider distribution
+insuranceButton = Button(main, text="Insurance Provider Distribution", command=show_insurance_distribution, bg="light coral")
+insuranceButton.place(x=450, y=520)
+insuranceButton.config(font=font1)
+
+
+def plot_medical_conditions():
+    age_group_65plus = df[df['Age'] >= 65]
+    condition_counts_65plus = age_group_65plus['Medical Condition'].value_counts()
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(condition_counts_65plus.index, condition_counts_65plus.values, color='skyblue')
+    plt.xlabel('Medical Condition')
+    plt.ylabel('Count')
+    plt.title('Medical Conditions for Patients aged 65+')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.show()
+
+medicalConditionButton = Button(main, text="Medical Conditions for Patients aged 65+", command=plot_medical_conditions, bg="light blue")
+medicalConditionButton.place(x=750, y=520)
+medicalConditionButton.config(font=font1)
+
+def plot_medical_conditions1():
+    # Analyze medical condition frequencies by gender
+    condition_freq_by_gender = df.groupby(['Gender', 'Medical Condition']).size().unstack(fill_value=0)
+
+    # Plot medical condition frequencies by gender
+    plt.figure(figsize=(10, 6))
+    condition_freq_by_gender.plot(kind='bar', stacked=True)
+    plt.xlabel('Medical Condition')
+    plt.ylabel('Count')
+    plt.title('Medical Condition Frequencies by Gender')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.legend(title='Gender')
+    plt.show()
+
+medicalConditionButton = Button(main, text="Medical Conditions by Gender1", command=plot_medical_conditions1, bg="light blue")
+medicalConditionButton.place(x=50, y=580)
+medicalConditionButton.config(font=font1)
+
+import plotly.express as px
+
+
+
+
+
+
+main.config(bg='skyblue')
+main.mainloop()
